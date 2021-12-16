@@ -2,8 +2,9 @@ import numpy as np
 from numpy.linalg import solve
 from scipy.integrate import solve_ivp
 from matplotlib import pyplot as plt
-from matplotlib.animation import FuncAnimation
+from matplotlib.animation import FuncAnimation, PillowWriter
 
+# class creation for arbitrary central body
 class CentralBody:
     def __init__(self, name, radius, Mu = None, mass = None):
         self.name = name
@@ -39,6 +40,7 @@ def twoBodySol(R, V):
                         
     return solve_ivp(twoBody, (0, 2*3600), state, method = 'RK23', t_eval = np.linspace(0, 2*3600, 1001))
 
+# main driver code to plot orbit and spacecraft orbiting the body
 def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu = 398600)):
     # instantiate figure
     fig = plt.figure()
@@ -47,11 +49,14 @@ def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu 
     # FUNCTIONS:
     # create orbit path from R, V vectors
     def twoBody(t, state):
+        # unpacking state vector
         R = np.array([state[0], state[1], state[2]])
         V = np.array([state[3], state[4], state[5]])
 
+        # definition of radius 
         rad = np.linalg.norm(R)
-        
+
+        # Orbital Kinematic Equations
         ax = -1*centralBody.mu*R[0] / (rad**3)
         ay = -1*centralBody.mu*R[1] / (rad**3)
         az = -1*centralBody.mu*R[2] / (rad**3)
@@ -60,12 +65,20 @@ def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu 
 
         return dState
     
+    # instantiating state vector
     state = np.array([R[0], R[1], R[2],
                         V[0], V[1], V[2]])
 
-    hBar = np.cross(RInitial, VInitial)
-                        
-    sol = solve_ivp(twoBody, (0, 100*60), state,method = 'RK23', t_eval = np.linspace(0, 100*60, 1000))
+    hBar = np.cross(RInitial, VInitial) # specific angular momentum of orbit
+
+    a = -centralBody.mu/(np.linalg.norm(VInitial)**2 - (2*centralBody.mu/np.linalg.norm(RInitial))) # equation for semi-major axis
+    period = 2*np.pi*(a**1.5)/(np.sqrt(centralBody.mu)) # equation for period of orbit
+
+    # running ODESolver to get radius, velocity vectors
+    # solving for tSpan of [0, period] with 1000 points in between
+    sol = solve_ivp(twoBody, (0, np.ceil(period)), state,method = 'RK23', t_eval = np.linspace(0, np.ceil(period), 1000))
+
+    # position vectors across the period
     spaceX = sol.y[0]
     spaceY = sol.y[1]
     spaceZ = sol.y[2]
@@ -88,19 +101,11 @@ def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu 
         ax.set_box_aspect((1,1,1))
 
     # PLOTTING
-    xPts = []
-    yPts = []
-    zPts = []
-
     def animate(i):
-        xPts.append(spaceX[i])
-        yPts.append(spaceY[i])
-        zPts.append(spaceZ[i])
-
-        ax.clear()
-        plotCentralBody()
-        ax.plot(spaceX, spaceY, spaceZ, color = 'blue', label = 'Orbit')
-        ax.scatter(xPts[-1], yPts[-1], zPts[-1], color = 'red', label = 'Spacecraft')
+        ax.clear()  # clear old plot
+        plotCentralBody()   # plot earth
+        ax.plot(spaceX, spaceY, spaceZ, color = 'blue', label = 'Orbit')    # plot orbit path
+        ax.scatter(spaceX[i], spaceY[i], spaceZ[i], color = 'red', label = 'Spacecraft')    # plot point on orbit
        
         # setting window parameters
         r = np.linalg.norm(RInitial)
@@ -114,14 +119,22 @@ def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu 
         ax.set_xlabel('X [km]')
         ax.set_ylabel('Y [km]')
         ax.set_zlabel('Z [km]')
-        ax.set_title('Spacecraft Orbiting Earth')
+        ax.set_title('Spacecraft Orbiting Earth\n1 sec = 1 min')
 
         # plot cleanliness (less clutter with label ticks)
         plt.locator_params(axis='x', nbins=5)
         plt.locator_params(axis='y', nbins=5)
         plt.locator_params(axis='z', nbins=5)
 
-    ani = FuncAnimation(fig, animate, frames = 900, interval = 1, repeat = True)
+    # animating plot
+    # NOTICE: The resulting animation has a 1:1 sec:min ratio; that is, 1 min in reality is 1 sec in the animation
+    ani = FuncAnimation(fig, animate, frames = 1000, interval = np.ceil(1000*60/period), repeat = True)
+
+    # saving output animation as GIF
+    file = r"/Users/gagandeepthapar/Desktop/Projects/interactiveOrbitVisualizer/OrbitVisualizer.gif"
+    writergif = PillowWriter(fps = 60)
+    ani.save(file, writer = writergif)
+
 
     plt.show()
 
