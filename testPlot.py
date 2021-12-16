@@ -24,12 +24,16 @@ def plotCentralBody(r = 6378, zoom = 2000):
     ylineNEG = np.array([-1*eleY for eleY in ylinePOS])
     zline = np.array([0 for eleX in xline])
 
-    # plotting
-    ax.plot_surface(radX, radY, radZ, alpha = 0.5)
     ax.scatter(0, 0, r, color = "red", label = "North Pole")
-    ax.scatter(0, 0, -r, color = "blue", label = "South Pole")
+    ax.scatter(0, 0, -r, color = "blue", label = "South Pole") 
+
     ax.plot(xline, ylinePOS, zline, color = 'orange')
     ax.plot(xline, ylineNEG, zline, color = 'orange', label = 'Trivial Orbit')
+
+    ax.legend()
+
+    # plotting
+    ax.plot_surface(radX, radY, radZ, alpha = 0.5)
 
     # setting window limits
     ax.set_xlim([-r - zoom, r + zoom])
@@ -41,7 +45,6 @@ def plotCentralBody(r = 6378, zoom = 2000):
     ax.set_xlabel('X [km]')
     ax.set_ylabel('Y [km]')
     ax.set_zlabel('Z [km]')
-    ax.legend()
     ax.set_title('Model of Earth centered at origin')
 
     plt.locator_params(axis='x', nbins=5)
@@ -49,7 +52,8 @@ def plotCentralBody(r = 6378, zoom = 2000):
     plt.locator_params(axis='z', nbins=5)
 
     # show window
-    plt.show()
+    # plt.show()
+    return plt
 
 if __name__ == "__main__":
     plotCentralBody()
