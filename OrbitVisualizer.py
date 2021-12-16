@@ -131,12 +131,12 @@ if __name__ == '__main__':
 
     sol = twoBodySol(R,V)
 
-    print(sol.y[0][0])
+    x = sol.y[0][-1]
+    y = sol.y[1][-1]
+    z = sol.y[2][-1]
 
-    print(sol.y[1][0])
+    print(np.linalg.norm([x,y,z]) == 10000)
 
-    print(sol.y[2][0])
-    
     # fig = plt.figure()
     # ax = plt.axes(projection = '3d')
     # plt.plot(sol.y[0], sol.y[1], sol.y[2])
