@@ -129,13 +129,7 @@ def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu 
     # animating plot
     # NOTICE: The resulting animation has a 1:1 sec:min ratio; that is, 1 min in reality is 1 sec in the animation
     ani = FuncAnimation(fig, animate, frames = 1000, interval = np.ceil(1000*60/period), repeat = True)
-
-    # saving output animation as GIF
-    file = r"/Users/gagandeepthapar/Desktop/Projects/interactiveOrbitVisualizer/OrbitVisualizer.gif"
-    writergif = PillowWriter(fps = 60)
-    ani.save(file, writer = writergif)
-
-
+    
     plt.show()
 
 if __name__ == '__main__':
