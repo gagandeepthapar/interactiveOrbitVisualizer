@@ -17,6 +17,7 @@ class CentralBody:
     def __repr__(self):
         return (f"{self.name}: Radius {self.rad} km; Mu {self.mu} km^3*s^-2")
 
+# test function - do not use for createOrbit
 def twoBodySol(R, V):
 
     def twoBody(t, state):
@@ -36,7 +37,7 @@ def twoBodySol(R, V):
     state = np.array([R[0], R[1], R[2],
                         V[0], V[1], V[2]])
                         
-    return solve_ivp(twoBody, (0, 2*3600), state, method = 'RK45', t_eval = np.linspace(0, 2*3600, 1001))
+    return solve_ivp(twoBody, (0, 2*3600), state, method = 'RK23', t_eval = np.linspace(0, 2*3600, 1001))
 
 def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu = 398600)):
     # instantiate figure
@@ -61,8 +62,10 @@ def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu 
     
     state = np.array([R[0], R[1], R[2],
                         V[0], V[1], V[2]])
+
+    hBar = np.cross(RInitial, VInitial)
                         
-    sol = solve_ivp(twoBody, (0, 24*3600), state, t_eval = np.linspace(0, 24*3600, 24*3600))
+    sol = solve_ivp(twoBody, (0, 100*60), state,method = 'RK23', t_eval = np.linspace(0, 100*60, 1000))
     spaceX = sol.y[0]
     spaceY = sol.y[1]
     spaceZ = sol.y[2]
@@ -118,26 +121,11 @@ def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu 
         plt.locator_params(axis='y', nbins=5)
         plt.locator_params(axis='z', nbins=5)
 
-    ani = FuncAnimation(fig, animate, frames = (int)((spaceX.size)/100), interval = 1, repeat = True)
+    ani = FuncAnimation(fig, animate, frames = 900, interval = 1, repeat = True)
 
     plt.show()
 
 if __name__ == '__main__':
-    R = np.array([10000, 0, 0])
+    R = np.array([6878, 0, 0])
     V = np.array([0, np.sqrt(398600/R[0]), 0])
-    # createOrbit(R, V)
-
-    state = np.array([R,V])
-
-    sol = twoBodySol(R,V)
-
-    x = sol.y[0][-1]
-    y = sol.y[1][-1]
-    z = sol.y[2][-1]
-
-    print(np.linalg.norm([x,y,z]) == 10000)
-
-    # fig = plt.figure()
-    # ax = plt.axes(projection = '3d')
-    # plt.plot(sol.y[0], sol.y[1], sol.y[2])
-    # plt.show()
+    createOrbit(R, V)
