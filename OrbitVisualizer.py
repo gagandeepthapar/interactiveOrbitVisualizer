@@ -18,7 +18,7 @@ class CentralBody:
     def __repr__(self):
         return (f"{self.name}: Radius {self.rad} km; Mu {self.mu} km^3*s^-2")
 
-# test function - do not use for createOrbit
+# debugging function - do not use for createOrbit
 def twoBodySol(R, V):
 
     def twoBody(t, state):
@@ -39,6 +39,101 @@ def twoBodySol(R, V):
                         V[0], V[1], V[2]])
                         
     return solve_ivp(twoBody, (0, 2*3600), state, method = 'RK23', t_eval = np.linspace(0, 2*3600, 1001))
+
+# returning state vector from classical orbital elements
+def coes2RV(angularMomentum, eccentricity, inclination, raan, argumentOfPerigee, trueAnomaly, centralBody = CentralBody("Earth", 6378, Mu = 398600)):
+    # Explanation of parameters
+        # inc - [deg] inclination of orbit
+        # raan - [deg] right ascenscion of ascending node
+        # ecc - [~] eccentricity of orbit
+        # arg - [deg] argument of perigee
+        # h - [km3s2] specific angular momentum of orbit
+        # ta - [deg] true anomaly of spacecraft on orbit
+        # a - [km] semi major axis of orbit
+        # M - [deg] mean anomaly (different from true anomaly)
+    # renaming parameters for use
+    h = angularMomentum
+    ecc = eccentricity
+    raan = np.deg2rad(raan)
+    inc = np.deg2rad(inclination)
+    arg = np.deg2rad(argumentOfPerigee)
+    ta = np.deg2rad(trueAnomaly)
+
+    periRConst = (h**2/centralBody.mu) * (1/(1 + ecc * np.cos(ta)))
+    periVConst = centralBody.mu/h
+
+    periRBar = periRConst * np.array([np.cos(ta), np.sin(ta), 0])
+    periVBar = periVConst * np.array([-1*np.sin(ta), ecc + np.cos(ta), 0])
+
+    R = 0
+    V = 0
+
+    Qa = np.array([-np.sin(raan)*np.cos(inc)*np.sin(arg) + np.cos(raan)*np.cos(arg), 
+                    -np.sin(raan)*np.cos(inc)*np.cos(arg) - np.cos(raan)*np.sin(arg),
+                        np.sin(raan)*np.sin(inc)])
+
+    Qb = np.array([np.cos(raan)*np.cos(inc)*np.sin(arg) + np.sin(raan)*np.cos(arg),
+                    np.cos(raan)*np.cos(inc)*np.cos(arg) - np.sin(raan)*np.sin(arg),
+                    -np.cos(raan)*np.sin(inc)])
+    
+    Qc = np.array([np.sin(inc)*np.sin(arg), np.sin(inc)*np.cos(arg), np.cos(inc)])
+
+    Q = np.array([Qa, Qb, Qc]).reshape(3,3)
+
+    R = Q*periRBar
+    V = Q*periVBar
+
+    return R, V
+
+# returning classical orbital elements from state vector
+def RV2coes(R, V, centralBody = CentralBody("Earth", 6378, Mu = 398600)):
+    # Explanation of parameters
+        # R - [km, km, km] position vector of spacecraft at some time, t
+        # V - [km/s, km/s, km/s] velocity vector of spacecraft at time t
+    # Explanation of variables
+        # h - angularMomentum [km3s-2]
+        # inc - inclination [deg]
+        # ecc - eccentricity
+        # raan - right ascenscion of ascending node [deg]
+        # arg - argumentOfPerigee [deg]
+        # ta - trueAnomaly [deg]
+        # a - semiMajorAxis [km]]
+
+    rad = np.linalg.norm(R)
+    vel = np.linalg.norm(V)
+    
+    radVel = np.dot(R, V)/rad
+    
+    hBar = np.cross(R, V)
+    h = np.linalg.norm(hBar)
+
+    inc = np.rad2deg(np.arccos(hBar[2]/h))
+
+    nodeBar = np.cross(np.array([0, 0, 1]), hBar)
+    node = np.linalg.norm(nodeBar)
+
+    raan = np.rad2deg(np.arccos(nodeBar[0]/node))
+    if nodeBar[1] < 0:
+        raan = 360-raan
+    
+    eccBar = 1/centralBody.mu * ((vel**2 - centralBody.mu/rad) * R - rad*radVel*V)
+    ecc = np.linalg.norm(eccBar)
+
+    arg = np.rad2deg(np.arccos(np.dot(nodeBar/node , eccBar/ecc)))
+    if eccBar[2] < 0:
+        arg = 360-arg
+    
+    ta = np.rad2deg(np.arccos(np.dot(eccBar/ecc , R/rad)))
+    if radVel < 0:
+        ta = 360-ta
+    
+    rP = (h**2 / centralBody.mu) * (1/(1 + ecc))
+    rA = (h**2 / centralBody.mu) * (1/(1 - ecc))
+    
+    a = 0.5*(rP + rA)
+
+    # return [angularMomentum [km3s-2], inclination [deg], eccentricity, raan [deg], argumentOfPerigee [deg], trueAnomaly [deg], semiMajorAxis [km]]
+    return np.array([h, inc, ecc, raan, arg, ta, a])
 
 # main driver code to plot orbit and spacecraft orbiting the body
 def createOrbit(RInitial, VInitial, centralBody = CentralBody("Earth", 6378, Mu = 398600)):
