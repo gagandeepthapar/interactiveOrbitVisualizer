@@ -109,11 +109,6 @@ def loop():
 
     ani = FuncAnimation(fig, animate, frames = 100, interval = 50, repeat = True)
 
-    # saving output animation as GIF
-    file = r"/Users/gagandeepthapar/Desktop/Projects/interactiveOrbitVisualizer/testAnimationLoop.gif"
-    writergif = PillowWriter(fps = 60)
-    ani.save(file, writer = writergif)
-
     # displaying plot
     plt.show()
     
