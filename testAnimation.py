@@ -109,9 +109,28 @@ def loop():
 
     ani = FuncAnimation(fig, animate, frames = 100, interval = 50, repeat = True)
 
+    def onclick(event, pauseFlag):
+        
+        if pauseFlag:
+            ani.pause()
+            print(f"PAUSED!")
+        else:
+            ani.resume()
+            print(f"RESUMED!")
+
+        print(f"PAUSE FLAG: {pauseFlag}")
+        
+        pauseFlag = not pauseFlag
+
+    cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick(event, True))
+    print(cid)
+
+    # fig.canvas.mpl_connect('button_press_event', toggle_pause(paused))
+
+
     # displaying plot
     plt.show()
     
 if __name__ == '__main__':
-    # loop()
-    inOrbit()
+    loop()
+    # inOrbit()
