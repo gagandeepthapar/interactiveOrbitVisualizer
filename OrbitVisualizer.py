@@ -106,7 +106,7 @@ class interAnimation:
         return f"Custom Interactive Animation Class"
         
     # custom pause function
-    def togglePause(self, event,  *args, **kwargs):
+    def togglePause(self, event):
         # only pauses when 'p' is pressed
         if event.key == 'p':
             if self.paused:
