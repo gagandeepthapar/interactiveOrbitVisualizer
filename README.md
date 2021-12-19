@@ -26,6 +26,6 @@ Users can also interact with the model using the arrow keys to perform impulse m
 The ``OrbitVisualizer.gif`` file is the creation of a simple 500 km-altitude circular orbit with 0 deg inclination. It should also be noted that the propagation of the spacecraft is 1 sec : 1 min. That is, 1 second of the animation represents 1 minute of the spacecraft's actual propagation.
 
 ## **Notable Libraries**
-* Numpy (general math operations)
-* Matplotlib (plotting)
-* Scipy (ODE solver)
+* NumPy
+* matplotlib
+* SciPy
