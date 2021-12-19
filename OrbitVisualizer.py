@@ -2,6 +2,7 @@ import numpy as np
 from scipy.integrate import solve_ivp
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
+import matplotlib.patheffects as path_effects
 from _helperFuncs import *
 
 class interAnimation:
@@ -116,7 +117,6 @@ class interAnimation:
             
             self.paused = not self.paused
 
-    
 
 if __name__ == '__main__':
     R = np.array([6878, 0, 0])
