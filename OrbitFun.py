@@ -23,6 +23,7 @@ class interactiveAnimation:
         self.legendFlag = True
         self.bodyFlag = True
         self.frameNum = 0
+
         return
 
     def __repr__(self):
@@ -65,6 +66,16 @@ class interactiveAnimation:
         self.bodyZ = self.body.rad*np.cos(phi)
 
     def plotSystem(self):
+        # instructions
+        print("Press 'p' to Pause Animation")
+        print("Press 'b' to toggle central body visibility")
+        print("Press 'l' to toggle legend visibility")
+        print("Press 'up' to burn 0.5km/s in +Y direction")
+        print("Press 'down' to burn 0.5km/s in -Y direction")
+        print("Press 'right' to burn 0.5km/s in +X direction")
+        print("Press 'left' to burn 0.5km/s in -X direction")
+        print("Press 'i' to burn 0.5km/s in +Z direction")
+        print("Press 'k' to burn 0.5km/s in -Z direction")
         def animate(i):
             self.frameNum = i
             self.ax.clear()
