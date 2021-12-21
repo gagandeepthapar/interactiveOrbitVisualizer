@@ -102,47 +102,59 @@ class interactiveAnimation:
         if event.key == 'p':
             if self.pauseFlag:
                 self.ani.resume()
+                print("RESUMED")
             else:
                 self.ani.pause()
+                print("PAUSED")
             
             self.pauseFlag = not self.pauseFlag
         
         # show legend
         if event.key == 'l':
             self.legendFlag = not self.legendFlag
+            print("TOGGLED LEGEND")
         
         if event.key == 'b':
             self.bodyFlag = not self.bodyFlag
+            print("TOGGLED BODY")
         
         # CONTROLS
-        burnKeys = 'aAsSdD'
+        burnKeys = ['left', 'right', 'up', 'down', 'i','k']
         if event.key in burnKeys:
             # + .5km/s in X-dir
-            if event.key == 'a':
+            if event.key == 'right':
                 self.V = np.array([self.orbitState[4][self.frameNum] + 0.5, self.orbitState[5][self.frameNum], self.orbitState[6][self.frameNum]])
+                print("+ 0.5km/s X")
             
             # - .5km/s in X-dir
-            if event.key == 'A': 
+            if event.key == 'left': 
                 self.V = np.array([self.orbitState[4][self.frameNum] - 0.5, self.orbitState[5][self.frameNum], self.orbitState[6][self.frameNum]])
+                print("- 0.5km/s X")
             
             # + .5km/s in Y-dir
-            if event.key == 's':
+            if event.key == 'up':
                 self.V = np.array([self.orbitState[4][self.frameNum], self.orbitState[5][self.frameNum] + 0.5, self.orbitState[6][self.frameNum]])
+                print("+ 0.5km/s Y")
             
             # - .5km/s in Y-dir
-            if event.key == 'S':
+            if event.key == 'down':
                 self.V = np.array([self.orbitState[4][self.frameNum], self.orbitState[5][self.frameNum] - 0.5, self.orbitState[6][self.frameNum]])
+                print("- 0.5km/s Y")
             
             # + .5km/s in Z-dir
-            if event.key == 'd':
+            if event.key == 'i':
                 self.V = np.array([self.orbitState[4][self.frameNum], self.orbitState[5][self.frameNum], self.orbitState[6][self.frameNum] + 0.5])
+                print("+ 0.5km/s Z")
             
             # - .5km/s in Z-dir
-            if event.key == 'D':
+            if event.key == 'k':
                 self.V = np.array([self.orbitState[4][self.frameNum], self.orbitState[5][self.frameNum], self.orbitState[6][self.frameNum] - 0.5])
+                print("- 0.5 km/s Z")
         
-            self.R = np.array([self.orbitState[1][self.frameNum],self.orbitState[1][self.frameNum],self.orbitState[1][self.frameNum]])
+            self.R = np.array([self.orbitState[1][self.frameNum],self.orbitState[2][self.frameNum],self.orbitState[3][self.frameNum]])
             self.computePath()
+            print(f"R: {self.R} km")
+            print(f"V: {self.V} km/s")
 
 if __name__ == '__main__':
     R = np.array([6878, 0, 0])
