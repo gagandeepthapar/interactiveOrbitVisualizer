@@ -14,7 +14,7 @@ I strutured the repository with different files to showcase a style of developme
 ### **_helperFuncs.py**
 [``_helperFuncs.py``](https://github.com/gagandeepthapar/interactiveOrbitVisualizer/blob/main/_helperFuncs.py) was created to store useful functions that can be called in any file (i.e., converting state vector to classical orbital elements). The file was developed while keeping in mind any body (as opposed to the Earth) can be used as the central body and the spacecraft can have any arbitrary orbit with either the state vector *or* the classical orbital elements used as an initialization method.
 
-### **OrbitVisualizer.py**</br>
+### **OrbitFun.py**</br>
 [``OrbitFun.py``](https://github.com/gagandeepthapar/interactiveOrbitVisualizer/blob/main/OrbitVisualizer.py) is the culmination of the discoveries of the previous test files. This script takes either the **state vector** (position and velocity) of a given spacecraft to create an acccurate representation of the spacecraft's orbit around the Earth. The orbit is created using a Runge Kutta (2,3) solver to integrate across Kepler's Equations of Motion. </br></br>
 Users can also interact with the model using the arrow keys to perform impulse maneuvers. Each maneuver represents a 500 m/s (0.5 km/s) impulse burn in a specified direction and see how their orbit is altered.</br>
 
