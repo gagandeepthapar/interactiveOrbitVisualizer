@@ -1,3 +1,4 @@
+from inspect import FrameInfo
 import numpy as np
 from scipy.integrate import solve_ivp
 from matplotlib import pyplot as plt
@@ -21,7 +22,7 @@ class interactiveAnimation:
         self.pauseFlag = False
         self.legendFlag = True
         self.bodyFlag = True
-
+        self.frameNum = 0
         return
 
     def __repr__(self):
@@ -65,6 +66,7 @@ class interactiveAnimation:
 
     def plotSystem(self):
         def animate(i):
+            self.frameNum = i
             self.ax.clear()
             if self.bodyFlag:
                 self.ax.plot_surface(self.bodyX, self.bodyY, self.bodyZ, alpha = 0.5)
@@ -112,7 +114,35 @@ class interactiveAnimation:
         if event.key == 'b':
             self.bodyFlag = not self.bodyFlag
         
-
+        # CONTROLS
+        burnKeys = 'aAsSdD'
+        if event.key in burnKeys:
+            # + .5km/s in X-dir
+            if event.key == 'a':
+                self.V = np.array([self.orbitState[4][self.frameNum] + 0.5, self.orbitState[5][self.frameNum], self.orbitState[6][self.frameNum]])
+            
+            # - .5km/s in X-dir
+            if event.key == 'A': 
+                self.V = np.array([self.orbitState[4][self.frameNum] - 0.5, self.orbitState[5][self.frameNum], self.orbitState[6][self.frameNum]])
+            
+            # + .5km/s in Y-dir
+            if event.key == 's':
+                self.V = np.array([self.orbitState[4][self.frameNum], self.orbitState[5][self.frameNum] + 0.5, self.orbitState[6][self.frameNum]])
+            
+            # - .5km/s in Y-dir
+            if event.key == 'S':
+                self.V = np.array([self.orbitState[4][self.frameNum], self.orbitState[5][self.frameNum] - 0.5, self.orbitState[6][self.frameNum]])
+            
+            # + .5km/s in Z-dir
+            if event.key == 'd':
+                self.V = np.array([self.orbitState[4][self.frameNum], self.orbitState[5][self.frameNum], self.orbitState[6][self.frameNum] + 0.5])
+            
+            # - .5km/s in Z-dir
+            if event.key == 'D':
+                self.V = np.array([self.orbitState[4][self.frameNum], self.orbitState[5][self.frameNum], self.orbitState[6][self.frameNum] - 0.5])
+        
+            self.R = np.array([self.orbitState[1][self.frameNum],self.orbitState[1][self.frameNum],self.orbitState[1][self.frameNum]])
+            self.computePath()
 
 if __name__ == '__main__':
     R = np.array([6878, 0, 0])
@@ -120,9 +150,3 @@ if __name__ == '__main__':
     anim = interactiveAnimation(R, V)
     anim.plotSystem()
     # print(anim.orbitState[0])
-
-    # A = np.array([1, 2, 3, 4])
-    # B = np.array([5, 6,7, 8])
-    # C = np.append([A, B, A, B, A, B])
-    # print(C)
-    
