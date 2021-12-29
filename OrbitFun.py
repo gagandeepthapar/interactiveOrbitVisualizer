@@ -14,6 +14,7 @@ class interactiveAnimation:
 
         self.computeBody()
         self.computePath()
+        self.tempPath = np.array([self.orbitState[1], self.orbitState[2], self.orbitState[3]])
 
         self.fig = plt.figure()
         self.ax = plt.axes(projection = '3d')
@@ -82,6 +83,7 @@ class interactiveAnimation:
             if self.bodyFlag:
                 self.ax.plot_surface(self.bodyX, self.bodyY, self.bodyZ, alpha = 0.5)
             self.ax.plot(self.orbitState[1], self.orbitState[2], self.orbitState[3], color = 'blue', label = 'Orbit')
+            self.ax.plot(self.tempPath[0], self.tempPath[1], self.tempPath[2], 'g--', label = 'Previous Orbit')
             self.ax.scatter(self.orbitState[1][i], self.orbitState[2][i], self.orbitState[3][i], color = 'red', label = 'Spacecraft')
 
             # set window boundaries
@@ -163,6 +165,7 @@ class interactiveAnimation:
                 print("- 0.5 km/s Z")
         
             self.R = np.array([self.orbitState[1][self.frameNum],self.orbitState[2][self.frameNum],self.orbitState[3][self.frameNum]])
+            self.tempPath = np.array([self.orbitState[1], self.orbitState[2], self.orbitState[3]])
             self.computePath()
             print(f"R: {self.R} km")
             print(f"V: {self.V} km/s")
